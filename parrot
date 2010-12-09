@@ -42,11 +42,3 @@ then (
   )
 fi
 
-#echo
-#echo '    ignored:'
-#git diff --name-only "$old_head..$new_head" | grep -E $FILE_PATTERN -v
-#
-#echo
-#echo '    not ignored:'
-#git diff --name-only "$old_head..$new_head" | grep -E $FILE_PATTERN
-
