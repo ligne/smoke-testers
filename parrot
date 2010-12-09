@@ -1,20 +1,17 @@
 #!/bin/sh
 
-# number of tests run in parallel.
-TEST_JOBS=6
+[ -r ~/.parrot-smoker.conf ] && . ~/.parrot-smoker.conf
 
-# number of parallel make jobs.  NOT USED YET.
-MAKE_JOBS=6
-
-# quieter test harness.
-HARNESS_VERBOSE=-2
-
-# email to submit as.
-SMOLDER_SUBMITTER=
+# set defaults
+: ${PARROT_REPOSITORY:=~/.smokers/parrot}
+: ${TEST_JOBS:=6}
+: ${MAKE_JOBS:=6}
+: ${HARNESS_VERBOSE:=-2}
 
 
 export SMOLDER_SUBMITTER TEST_JOBS HARNESS_VERBOSE
 
+cd $PARROT_REPOSITORY
 old_head=`git rev-parse master`
 git pull -q
 new_head=`git rev-parse master`
@@ -41,4 +38,50 @@ then (
     rm -rf $PARROT_SMOKE_DIR
   )
 fi
+
+exit
+
+: <<"POD"
+
+=head1 parrot
+
+Smoker script for Parrot.
+
+=head1 Configuration
+
+The defaults should be more or less sane.  If you want to override any of them
+create a file called C<.parrot-config.conf> in the root of your home directory
+and put your custom settings there.  It should just be a normal shell script.  eg.
+
+  PARROT_REPOSITORY=~/projects/parrot
+  TEST_JOBS=2
+
+=over 4
+
+=item C<PARROT_CLONE>
+
+The directory with a master clone of Parrot.
+
+=item C<TEST_JOBS>
+
+The number of tests to run in parallel.  Default is 6.
+
+=item C<MAKE_JOBS>
+
+The number of parallel make jobs to use.  Not used yet, it's currently hard-coded to 6.
+
+=item C<HARNESS_VERBOSE>
+
+The test harness verbosity.  Default value is -2 (only displays the
+final summary).  Set this to -3 for a completely silent test harness (bar any
+errors), or to 0 for the normal output.
+
+=item C<SMOLDER_SUBMITTER>
+
+The email address the smoke report should be submitted as.  No default.
+
+=back
+
+=cut
+POD
 
