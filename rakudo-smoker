@@ -58,8 +58,9 @@ then
       # into the appropriate place.
       PARROT_REVISION=$(cat build/PARROT_REVISION)
       PARROT_DIR="$(dirname $RAKUDO_REPOSITORY)/parrot-$PARROT_REVISION"
+      PARROT_CONFIG_BIN="$PARROT_DIR/bin/parrot_config"
 
-      if ! [ -d "$PARROT_DIR" -a -e "$PARROT_DIR/bin/parrot_config" -a "$($PARROT_DIR/bin/parrot_config git_describe)" = "$PARROT_REVISION" ]
+      if ! [ -d "$PARROT_DIR" -a -e "$PARROT_CONFIG_BIN" -a "$($PARROT_CONFIG_BIN git_describe)" = "$PARROT_REVISION" ]
       then (
         mkdir -p $PARROT_DIR
         cd $PARROT_REPOSITORY
