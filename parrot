@@ -8,13 +8,16 @@
 : ${MAKE_JOBS:=6}
 : ${HARNESS_VERBOSE:=-2}
 
-
 export SMOLDER_SUBMITTER TEST_JOBS HARNESS_VERBOSE
 
+
+# the branch to test
+BRANCH='origin/master'
+
 cd $PARROT_REPOSITORY
-old_head=`git rev-parse master`
+old_head=`git rev-parse $BRANCH`
 git pull -q
-new_head=`git rev-parse master`
+new_head=`git rev-parse $BRANCH`
 
 # nothing to do...
 [ -n "$old_head" -a "$old_head" = "$new_head" ] && exit;
