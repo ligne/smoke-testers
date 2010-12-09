@@ -1,0 +1,142 @@
+#!/bin/sh -e
+
+# import the Parrot test settings too, since we're likely to be needing them.
+# but do it first so the Rakudo ones take precedence
+[ -r ~/.parrot-smoker.conf ] && . ~/.parrot-smoker.conf
+[ -r ~/.rakudo-smoker.conf ] && . ~/.rakudo-smoker.conf
+
+# set defaults
+: ${PARROT_REPOSITORY:=~/.smokers/parrot}
+: ${RAKUDO_REPOSITORY:=~/.smokers/rakudo}
+: ${TEST_JOBS:=6}
+: ${MAKE_JOBS:=6}
+: ${HARNESS_VERBOSE:=-2}
+
+export SMOLDER_SUBMITTER TEST_JOBS HARNESS_VERBOSE
+
+MAKE_OPTS="-j${MAKE_JOBS}"
+
+# create new clones if they don't exist already
+if ! [ -d "$RAKUDO_REPOSITORY" ]
+then
+  git clone git://github.com/rakudo/rakudo.git $RAKUDO_REPOSITORY
+fi
+if ! [ -d "$PARROT_REPOSITORY" ]
+then
+  git clone git://github.com/parrot/parrot.git $PARROT_REPOSITORY
+fi
+
+# the branch to test
+BRANCH='origin/master'
+
+cd $RAKUDO_REPOSITORY
+old_head=`git rev-parse $BRANCH`
+git pull -q
+new_head=`git rev-parse $BRANCH`
+
+# nothing to do...
+#[ -n "$old_head" -a "$old_head" = "$new_head" ] && exit;
+
+# only test if one or more files matching this pattern have been modified
+# FIXME: check there aren't any more
+FILE_PATTERN='\.(pm|[chtly]|in|ops|pir|pmc|tg)$'
+
+if true #git diff --name-only "$old_head..$new_head" | grep -qE $FILE_PATTERN
+then
+    RAKUDO_SMOKE_DIR=`mktemp -d`
+    [ -n "$RAKUDO_SMOKE_DIR" ] || exit;
+
+    git archive --format=tar $new_head | (
+      cd $RAKUDO_SMOKE_DIR
+
+      tar xf -
+
+      # FIXME also need to clone the spectests
+
+      # need to make sure we've got a build of the right version of parrot
+      # first.  create a temp directory, build parrot there, and the install
+      # into the appropriate place.
+      PARROT_REVISION=$(cat build/PARROT_REVISION)
+      PARROT_DIR="$(dirname $RAKUDO_REPOSITORY)/parrot-$PARROT_REVISION"
+
+      if ! [ -d "$PARROT_DIR" -a -e "$PARROT_DIR/bin/parrot_config" -a "$($PARROT_DIR/bin/parrot_config git_describe)" = "$PARROT_REVISION" ]
+      then (
+        mkdir -p $PARROT_DIR
+        cd $PARROT_REPOSITORY
+
+        git pull -q
+
+        PARROT_SMOKE_DIR=`mktemp -d`
+        [ -n "$PARROT_BUILD_DIR" ] || exit;
+
+        git archive --format=tar $PARROT_REVISION | {
+          cd $PARROT_BUILD_DIR
+
+          tar xf -
+
+          perl Configure.pl --silent --prefix=$PARROT_DIR
+          make --silent $MAKE_OPTS
+          make --silent test
+          make install
+
+          rm -rf $PARROT_BUILD_DIR
+        }
+      )
+      fi
+
+      perl Configure.pl --parrot-config="$PARROT_DIR/bin/parrot_config"
+      make --silent $MAKE_OPTS
+      make --silent smoke
+
+      rm -rf $RAKUDO_SMOKE_DIR
+  )
+fi
+
+exit
+
+: <<"POD"
+
+=head1 parrot
+
+Smoker script for Rakudo Perl 6.
+
+=head1 Configuration
+
+The defaults should be more or less sane.  If you want to override any of them
+create a file called C<.rakudo-config.conf> in the root of your home directory
+and put your custom settings there.  It should just be a normal shell script.
+eg.
+
+  PARROT_REPOSITORY=~/projects/parrot
+  TEST_JOBS=2
+
+=over 4
+
+=item C<RAKUDO_REPOSITORY>, C<PARROT_REPOSITORY>
+
+The directory with a master clone of Rakudo and Parrot respectively.
+
+=item C<TEST_JOBS>
+
+The number of tests to run in parallel.  Default is 6.
+
+=item C<MAKE_JOBS>
+
+The number of parallel make jobs to use.  Default is 6.
+
+=item C<HARNESS_VERBOSE>
+
+The test harness verbosity.  Default value is -2 (only displays the
+final summary).  Set this to -3 for a completely silent test harness (bar any
+errors), or to 0 for the normal output.
+
+=item C<SMOLDER_SUBMITTER>
+
+The email address the smoke report should be submitted as.  No default, since
+the Parrot test harness can usually make a good guess at a sensible value.
+
+=back
+
+=cut
+POD
+
