@@ -67,27 +67,25 @@ then
 
         git pull -q
 
-        PARROT_SMOKE_DIR=`mktemp -d`
+        PARROT_BUILD_DIR=`mktemp -d`
         [ -n "$PARROT_BUILD_DIR" ] || exit;
 
-        git archive --format=tar $PARROT_REVISION | {
-          cd $PARROT_BUILD_DIR
+        git clone $PARROT_REPOSITORY $PARROT_BUILD_DIR
 
-          tar xf -
+        cd $PARROT_BUILD_DIR
 
-          perl Configure.pl --silent --prefix=$PARROT_DIR
-          make --silent $MAKE_OPTS
-          make --silent test
-          make install
+        perl Configure.pl --silent --prefix=$PARROT_DIR
+        make --silent $MAKE_OPTS
+#        make --silent test
+        make install
 
-          rm -rf $PARROT_BUILD_DIR
-        }
+        rm -rf $PARROT_BUILD_DIR
       )
       fi
 
       perl Configure.pl --parrot-config="$PARROT_DIR/bin/parrot_config"
       make --silent $MAKE_OPTS
-      make --silent smoke
+#      make --silent smoke
 
       rm -rf $RAKUDO_SMOKE_DIR
   )
