@@ -62,7 +62,8 @@ Smoker script for Parrot.
 
 The defaults should be more or less sane.  If you want to override any of them
 create a file called C<.parrot-config.conf> in the root of your home directory
-and put your custom settings there.  It should just be a normal shell script.  eg.
+and put your custom settings there.  It should just be a normal shell script.
+eg.
 
   PARROT_REPOSITORY=~/projects/parrot
   TEST_JOBS=2
@@ -89,7 +90,8 @@ errors), or to 0 for the normal output.
 
 =item C<SMOLDER_SUBMITTER>
 
-The email address the smoke report should be submitted as.  No default.
+The email address the smoke report should be submitted as.  No default, since
+the Parrot test harness can usually make a good guess at a sensible value.
 
 =back
 
