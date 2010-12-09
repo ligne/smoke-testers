@@ -12,6 +12,12 @@ export SMOLDER_SUBMITTER TEST_JOBS HARNESS_VERBOSE
 
 MAKE_OPTS="-j${MAKE_JOBS}"
 
+# create a new clone if it doesn't exist already
+if ! [ -d "$PARROT_REPOSITORY" ]
+then
+  git clone git://github.com/parrot/parrot.git $PARROT_REPOSITORY
+fi
+
 # the branch to test
 BRANCH='origin/master'
 
