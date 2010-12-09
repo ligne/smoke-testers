@@ -70,7 +70,7 @@ eg.
 
 =over 4
 
-=item C<PARROT_CLONE>
+=item C<PARROT_REPOSITORY>
 
 The directory with a master clone of Parrot.
 
