@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 [ -r ~/.parrot-smoker.conf ] && . ~/.parrot-smoker.conf
 
@@ -38,8 +38,6 @@ then
     [ -n "$PARROT_SMOKE_DIR" ] || exit;
 
     git archive --format=tar $new_head | (
-      set -e
-
       cd $PARROT_SMOKE_DIR
 
       tar xf -
