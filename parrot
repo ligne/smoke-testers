@@ -10,6 +10,7 @@
 
 export SMOLDER_SUBMITTER TEST_JOBS HARNESS_VERBOSE
 
+MAKE_OPTS="-j${MAKE_JOBS}"
 
 # the branch to test
 BRANCH='origin/master'
@@ -36,7 +37,7 @@ then (
     cd $PARROT_SMOKE_DIR
 
     perl Configure.pl --silent
-    make --silent -j6
+    make --silent $MAKE_OPTS
     make --silent smoke
 
     rm -rf $PARROT_SMOKE_DIR
@@ -72,7 +73,7 @@ The number of tests to run in parallel.  Default is 6.
 
 =item C<MAKE_JOBS>
 
-The number of parallel make jobs to use.  Not used yet, it's currently hard-coded to 6.
+The number of parallel make jobs to use.  Default is 6.
 
 =item C<HARNESS_VERBOSE>
 
