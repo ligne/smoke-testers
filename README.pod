@@ -1,0 +1,7 @@
+=head1 Smoke testers
+
+Scripts to automatically smoke-test various projects.  Currently just
+L<Parrot|http://www.parrot.org/>.
+
+Run C<perldoc $script_name> to view documentation on individual scripts.
+
