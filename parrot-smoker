@@ -33,20 +33,22 @@ new_head=`git rev-parse $BRANCH`
 FILE_PATTERN='\.(pm|[chtly]|in|ops|pir|pmc|tg)$'
 
 if git diff --name-only "$old_head..$new_head" | grep -qE $FILE_PATTERN
-then (
-    set -e
-
+then
     PARROT_SMOKE_DIR=`mktemp -d`
     [ -n "$PARROT_SMOKE_DIR" ] || exit;
 
-    git checkout-index --prefix=${PARROT_SMOKE_DIR}/ -a
-    cd $PARROT_SMOKE_DIR
+    git archive --format=tar $new_head | (
+      set -e
 
-    perl Configure.pl --silent
-    make --silent $MAKE_OPTS
-    make --silent smoke
+      cd $PARROT_SMOKE_DIR
 
-    rm -rf $PARROT_SMOKE_DIR
+      tar xf -
+
+      perl Configure.pl --silent
+      make --silent $MAKE_OPTS
+      make --silent smoke
+
+      rm -rf $PARROT_SMOKE_DIR
   )
 fi
 
