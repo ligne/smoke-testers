@@ -83,6 +83,8 @@ then
       )
       fi
 
+      [ "$($PARROT_CONFIG_BIN git_describe)" = "$PARROT_REVISION" ] || exit
+
       perl Configure.pl --parrot-config="$PARROT_DIR/bin/parrot_config"
       make --silent $MAKE_OPTS
 #      make --silent smoke
