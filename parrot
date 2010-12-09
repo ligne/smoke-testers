@@ -22,6 +22,7 @@ new_head=`git rev-parse $BRANCH`
 # nothing to do...
 [ -n "$old_head" -a "$old_head" = "$new_head" ] && exit;
 
+# only test if one or more files matching this pattern have been modified
 FILE_PATTERN='\.(pm|[chtly]|in|ops|pir|pmc|tg)$'
 
 if git diff --name-only "$old_head..$new_head" | grep -qE $FILE_PATTERN
