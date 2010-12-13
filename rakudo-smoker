@@ -26,6 +26,7 @@ then
   git clone git://github.com/parrot/parrot.git $PARROT_REPOSITORY
 fi
 
+
 # the branch to test
 BRANCH='origin/master'
 
@@ -60,7 +61,7 @@ then
       PARROT_DIR="$(dirname $RAKUDO_REPOSITORY)/parrot-$PARROT_REVISION"
       PARROT_CONFIG_BIN="$PARROT_DIR/bin/parrot_config"
 
-      if ! [ -d "$PARROT_DIR" -a -e "$PARROT_CONFIG_BIN" -a "$($PARROT_CONFIG_BIN git_describe)" = "$PARROT_REVISION" ]
+      if ! [ -d "$PARROT_DIR" -a -e "$PARROT_CONFIG_BIN" ]
       then (
         mkdir -p $PARROT_DIR
         cd $PARROT_REPOSITORY
@@ -82,8 +83,6 @@ then
         rm -rf $PARROT_BUILD_DIR
       )
       fi
-
-      [ "$($PARROT_CONFIG_BIN git_describe)" = "$PARROT_REVISION" ] || exit
 
       perl Configure.pl --parrot-config="$PARROT_DIR/bin/parrot_config"
       make --silent $MAKE_OPTS
