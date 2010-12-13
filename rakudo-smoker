@@ -41,13 +41,13 @@ git pull -q
 new_head=`git rev-parse $BRANCH`
 
 # nothing to do...
-#[ -n "$old_head" -a "$old_head" = "$new_head" ] && exit;
+[ -n "$old_head" -a "$old_head" = "$new_head" ] && exit;
 
 # only test if one or more files matching this pattern have been modified
 # FIXME: check there aren't any more
 FILE_PATTERN='\.(pm|[chtly]|in|ops|pir|pmc|tg)$'
 
-if true #git diff --name-only "$old_head..$new_head" | grep -qE $FILE_PATTERN
+if git diff --name-only "$old_head..$new_head" | grep -qE $FILE_PATTERN
 then
   RAKUDO_SMOKE_DIR=`mktemp -d`
   [ -n "$RAKUDO_SMOKE_DIR" ] || exit;
