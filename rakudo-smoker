@@ -8,6 +8,7 @@
 # set defaults
 : ${PARROT_REPOSITORY:=~/.smokers/parrot}
 : ${RAKUDO_REPOSITORY:=~/.smokers/rakudo}
+: ${SPECTEST_REPOSITORY:=~/.smokers/p6-spectest}
 : ${TEST_JOBS:=2}
 : ${MAKE_JOBS:=6}
 : ${HARNESS_VERBOSE:=-2}
@@ -24,6 +25,10 @@ fi
 if ! [ -d "$PARROT_REPOSITORY" ]
 then
   git clone git://github.com/parrot/parrot.git $PARROT_REPOSITORY
+fi
+if ! [ -d "$SPECTEST_REPOSITORY" ]
+then
+  git clone git://github.com/perl6/roast.git $SPECTEST_REPOSITORY
 fi
 
 
@@ -50,7 +55,9 @@ then
   cd $RAKUDO_SMOKE_DIR
   git clone $RAKUDO_REPOSITORY .
 
-  # FIXME also need to clone the spectests
+  # also need to clone the spectests (after checking they're up to date)
+  (cd $SPECTEST_REPOSITORY; git pull -q)
+  git clone $SPECTEST_REPOSITORY t/spec
 
   # need to make sure we've got a build of a sufficiently recent version of
   # parrot first.  create a temp directory, build parrot there, and the
