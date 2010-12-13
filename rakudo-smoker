@@ -44,60 +44,57 @@ FILE_PATTERN='\.(pm|[chtly]|in|ops|pir|pmc|tg)$'
 
 if true #git diff --name-only "$old_head..$new_head" | grep -qE $FILE_PATTERN
 then
-    RAKUDO_SMOKE_DIR=`mktemp -d`
-    [ -n "$RAKUDO_SMOKE_DIR" ] || exit;
+  RAKUDO_SMOKE_DIR=`mktemp -d`
+  [ -n "$RAKUDO_SMOKE_DIR" ] || exit;
 
-    git archive --format=tar $new_head | (
-      cd $RAKUDO_SMOKE_DIR
+  cd $RAKUDO_SMOKE_DIR
+  git clone $RAKUDO_REPOSITORY .
 
-      tar xf -
+  # FIXME also need to clone the spectests
 
-      # FIXME also need to clone the spectests
+  # need to make sure we've got a build of a sufficiently recent version of
+  # parrot first.  create a temp directory, build parrot there, and the
+  # install into an appropriate place.
+  PARROT_REVISION_HASH=$(git hash-object build/PARROT_REVISION)
+  PARROT_DIR="$(dirname $RAKUDO_REPOSITORY)/rakudo-parrot-$PARROT_REVISION_HASH"
+  PARROT_CONFIG_BIN="$PARROT_DIR/bin/parrot_config"
 
-      # need to make sure we've got a build of a sufficiently recent version of
-      # parrot first.  create a temp directory, build parrot there, and the
-      # install into an appropriate place.
-      PARROT_REVISION_HASH=$(git hash-object build/PARROT_REVISION)
-      PARROT_DIR="$(dirname $RAKUDO_REPOSITORY)/rakudo-parrot-$PARROT_REVISION_HASH"
-      PARROT_CONFIG_BIN="$PARROT_DIR/bin/parrot_config"
+  # either hasn't been built yet, or the minimum Parrot version has been
+  # changed.
+  if ! [ -d "$PARROT_DIR" -a -e "$PARROT_CONFIG_BIN" ]
+  then (
+    mkdir -p $PARROT_DIR
+    cd $PARROT_REPOSITORY
 
-      # either hasn't been built yet, or the minimum Parrot version has been
-      # changed.
-      if ! [ -d "$PARROT_DIR" -a -e "$PARROT_CONFIG_BIN" ]
-      then (
-        mkdir -p $PARROT_DIR
-        cd $PARROT_REPOSITORY
+    git pull -q
 
-        git pull -q
+    PARROT_BUILD_DIR=`mktemp -d`
+    [ -n "$PARROT_BUILD_DIR" ] || exit;
 
-        PARROT_BUILD_DIR=`mktemp -d`
-        [ -n "$PARROT_BUILD_DIR" ] || exit;
+    git clone $PARROT_REPOSITORY $PARROT_BUILD_DIR
 
-        git clone $PARROT_REPOSITORY $PARROT_BUILD_DIR
+    cd $PARROT_BUILD_DIR
 
-        cd $PARROT_BUILD_DIR
+    perl Configure.pl --silent --prefix=$PARROT_DIR
+    make --silent $MAKE_OPTS
+    make --silent test
+    make install
 
-        perl Configure.pl --silent --prefix=$PARROT_DIR
-        make --silent $MAKE_OPTS
-        make --silent test
-        make install
-
-        rm -rf $PARROT_BUILD_DIR
-      )
-      fi
-
-      if ! [ -d "$PARROT_DIR" -a -e "$PARROT_CONFIG_BIN" ]
-      then
-        echo "Still no Parrot built (should be in ${PARROT_DIR}).  Bailing"
-        exit
-      fi
-
-      perl Configure.pl --parrot-config="$PARROT_DIR/bin/parrot_config"
-      make --silent $MAKE_OPTS
-      make --silent $MAKE_OPTS spectest_smolder
-
-      rm -rf $RAKUDO_SMOKE_DIR
+    rm -rf $PARROT_BUILD_DIR
   )
+  fi
+
+  if ! [ -d "$PARROT_DIR" -a -e "$PARROT_CONFIG_BIN" ]
+  then
+    echo "Still no Parrot built (should be in ${PARROT_DIR}).  Bailing"
+    exit
+  fi
+
+  perl Configure.pl --parrot-config="$PARROT_DIR/bin/parrot_config"
+  make --silent $MAKE_OPTS
+  make --silent $MAKE_OPTS spectest_smolder
+
+  rm -rf $RAKUDO_SMOKE_DIR
 fi
 
 exit
