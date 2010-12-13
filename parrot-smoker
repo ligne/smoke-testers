@@ -51,14 +51,14 @@ exit
 
 : <<"POD"
 
-=head1 parrot
+=head1 parrot-smoker
 
-Smoker script for Parrot.
+Smoke testing script for Parrot.
 
 =head1 Configuration
 
 The defaults should be more or less sane.  If you want to override any of them
-create a file called C<.parrot-config.conf> in the root of your home directory
+create a file called C<.parrot-smoker.conf> in the root of your home directory
 and put your custom settings there.  It should just be a normal shell script.
 eg.
 

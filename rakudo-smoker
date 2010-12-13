@@ -108,29 +108,33 @@ exit
 
 : <<"POD"
 
-=head1 parrot
+=head1 rakudo-smoker
 
-Smoker script for Rakudo Perl 6.
+Smoke testing script for Rakudo Perl 6.
 
 =head1 Configuration
 
 The defaults should be more or less sane.  If you want to override any of them
-create a file called C<.rakudo-config.conf> in the root of your home directory
+create a file called C<.rakudo-smoker.conf> in the root of your home directory
 and put your custom settings there.  It should just be a normal shell script.
 eg.
 
   PARROT_REPOSITORY=~/projects/parrot
   TEST_JOBS=2
 
+It will also load configuration options from C<.parrot-smoker.conf> if that
+file exists, but settings from the Rakudo configuration take precedence.
+
 =over 4
 
-=item C<RAKUDO_REPOSITORY>, C<PARROT_REPOSITORY>
+=item C<RAKUDO_REPOSITORY>, C<PARROT_REPOSITORY>, C<SPECTEST_REPOSITORY>
 
-The directory with a master clone of Rakudo and Parrot respectively.
+The directory with a master clone of Rakudo, Parrot and the Perl 6 specteset
+suite respectively.
 
 =item C<TEST_JOBS>
 
-The number of tests to run in parallel.  Default is 6.
+The number of tests to run in parallel.  Default is 2.
 
 =item C<MAKE_JOBS>
 
