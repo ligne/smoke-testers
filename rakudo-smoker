@@ -54,13 +54,15 @@ then
 
       # FIXME also need to clone the spectests
 
-      # need to make sure we've got a build of the right version of parrot
-      # first.  create a temp directory, build parrot there, and the install
-      # into the appropriate place.
-      PARROT_REVISION=$(cat build/PARROT_REVISION)
-      PARROT_DIR="$(dirname $RAKUDO_REPOSITORY)/parrot-$PARROT_REVISION"
+      # need to make sure we've got a build of a sufficiently recent version of
+      # parrot first.  create a temp directory, build parrot there, and the
+      # install into an appropriate place.
+      PARROT_REVISION_HASH=$(git hash-object build/PARROT_REVISION)
+      PARROT_DIR="$(dirname $RAKUDO_REPOSITORY)/rakudo-parrot-$PARROT_REVISION_HASH"
       PARROT_CONFIG_BIN="$PARROT_DIR/bin/parrot_config"
 
+      # either hasn't been built yet, or the minimum Parrot version has been
+      # changed.
       if ! [ -d "$PARROT_DIR" -a -e "$PARROT_CONFIG_BIN" ]
       then (
         mkdir -p $PARROT_DIR
