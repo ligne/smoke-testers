@@ -1,7 +1,16 @@
 =head1 Smoke testers
 
-Scripts to automatically smoke-test various projects.  Currently just
-L<Parrot|http://www.parrot.org/>.
+Scripts to automatically smoke-test various projects.  Currently both
+L<Parrot|http://www.parrot.org/> and L<Rakudo Perl 6|http://rakudo.org/> are
+supported.
 
-Run C<perldoc $script_name> to view documentation on individual scripts.
+Use C<perldoc $script_name> to view documentation on individual scripts.
+
+Example cron entries:
+
+  31 */4 * * * exec dash /path/to/smoke/testers/parrot-smoker
+  44 03  * * * exec dash /path/to/smoke/testers/rakudo-smoker
+
+(These will run the Parrot test suite every 4h, and the Rakudo test suite once
+a night.)
 
