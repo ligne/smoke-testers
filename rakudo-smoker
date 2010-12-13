@@ -8,7 +8,7 @@
 # set defaults
 : ${PARROT_REPOSITORY:=~/.smokers/parrot}
 : ${RAKUDO_REPOSITORY:=~/.smokers/rakudo}
-: ${TEST_JOBS:=6}
+: ${TEST_JOBS:=2}
 : ${MAKE_JOBS:=6}
 : ${HARNESS_VERBOSE:=-2}
 
@@ -79,7 +79,7 @@ then
 
         perl Configure.pl --silent --prefix=$PARROT_DIR
         make --silent $MAKE_OPTS
-#        make --silent test
+        make --silent test
         make install
 
         rm -rf $PARROT_BUILD_DIR
@@ -94,7 +94,7 @@ then
 
       perl Configure.pl --parrot-config="$PARROT_DIR/bin/parrot_config"
       make --silent $MAKE_OPTS
-#      make --silent smoke
+      make --silent $MAKE_OPTS spectest_smolder
 
       rm -rf $RAKUDO_SMOKE_DIR
   )
